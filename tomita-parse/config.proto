@@ -6,11 +6,12 @@ TTextMinerConfig {
   //PrettyOutput = "pretty.html"; 
 
   Input = {
-    File = "input.txt"; 
+    File = "test.txt"; 
   }
 
   Articles = [
-    { Name = "персоны" },
+    { Name = "имя" },
+    { Name = "People" },
     { Name = "достопримечательности" }
   ]
 

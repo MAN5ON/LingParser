@@ -6,3 +6,8 @@ message Person: NFactType.TFact
     // Тип данных должен быть NFactType.TFio, а не привычный string.
     required NFactType.TFio Name = 1;
 }
+
+message Place: NFactType.TFact 
+{
+    required string Name = 1;
+}
