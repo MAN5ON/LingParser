@@ -8,6 +8,8 @@ data_text
 # tomita-parser
 input.txt
 output.txt
+facts.txt
+test.txt
 *.bin
 *.gzt.bin
 
