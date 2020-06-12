@@ -8,6 +8,8 @@ data_text
 # tomita-parser
 input.txt
 output.txt
+*.bin
+*.gzt.bin
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
