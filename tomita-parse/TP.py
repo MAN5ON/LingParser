@@ -3,14 +3,14 @@ import subprocess
 import time
 from pymongo import MongoClient
 
-def write_sentence_db(sentences_suitable, news_id):
-    if sentences_suitable:
-        collection_sentence.insert_one({"news_id": news_id, "sentence": sentences_suitable})
+def write_sentence_db(setneces_person,sentences_place, news_id):
+    if setneces_person or  sentences_place :
+        collection_sentence.insert_one({"news_id": news_id, "sentence_person": setneces_person, "sentence_places": sentences_place})
 
 
-def getSentence(news_id):
+def getSentencePerson(news_id):
     sentences = []
-    sentences_suitable = []
+    sentences_suitable_person = []
     with open("facts.txt") as file:
         facts_text = file.read()
     s = re.sub(r'\s+', ' ', facts_text, flags=re.M)
@@ -18,11 +18,27 @@ def getSentence(news_id):
     for s in re.split(r'(?<=[.!?…]) ', s):
         sentences.append(s)
         if (bool(re.search(r'Person { Name ', sentences[i])) == True):
-            sentences_suitable.append(sentences[i - 1])
+            sentences_suitable_person.append(sentences[i - 1])
         i += 1
 
-    write_sentence_db(sentences_suitable, news_id)
     file.close()
+    return sentences_suitable_person
+
+def getSentencePlace(news_id):
+    sentences = []
+    sentences_suitable_places = []
+    with open("facts.txt") as file:
+        facts_text = file.read()
+    s = re.sub(r'\s+', ' ', facts_text, flags=re.M)
+    i = 0
+    for s in re.split(r'(?<=[.!?…]) ', s):
+        sentences.append(s)
+        if (bool(re.search(r'Place { Name ', sentences[i])) == True):
+            sentences_suitable_places.append(sentences[i - 1])
+        i += 1
+
+    file.close()
+    return sentences_suitable_places
 
 
 def tparse():
@@ -40,7 +56,23 @@ def tparse():
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # Вместо /home/skelllet/tomita-parser/build/bin/tomita-parser должно быть tomita-parser, но у меня не сработало
         time.sleep(0.7)#Без этого данные в бд отображаются неверно
-        getSentence(news_id)
+        seteneces_person = getSentencePerson(news_id)
+        if seteneces_person:
+            deleteExcess(seteneces_person)
+        sentences_place = getSentencePlace(news_id)
+        if sentences_place:
+            deleteExcess(sentences_place)
+        write_sentence_db(seteneces_person, sentences_place, news_id)
+
+def deleteExcess(sentence):
+    k = -1
+    for i in sentence:
+        k+=1
+        excess = re.findall("Person.*}|Place.*}", i)
+        excess_toString = ''.join(excess)
+        if excess_toString:
+            sentence[k] = re.sub(excess_toString, '', sentence[k])
+
 
 
 if __name__ == '__main__':
