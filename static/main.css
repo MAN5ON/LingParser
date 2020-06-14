@@ -1,0 +1,48 @@
+.head {
+    color: #f9fdff;
+    font-size: 30px;
+    font-family: "Century Gothic", serif;
+    text-align: center;
+}
+
+body {
+    background: #20252a;
+}
+
+span {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #f9fdff;
+    text-align: justify;
+    font-family: "Century Gothic", serif;
+}
+
+li {
+    padding: 10px;
+    list-style-type: none;
+}
+
+.post {
+    background: #323940;
+    padding: 15px;
+}
+
+.vse {
+    text-align: center;
+}
+
+a {
+    color: #86989B;
+    text-decoration: none
+}
+
+.link {
+        text-align: center;
+}
+.link a {
+    text-decoration: none;
+    font-size: 20px;
+    color: #31c333;
+    line-height: 1.5;
+    font-family: "Century Gothic", serif;
+}
