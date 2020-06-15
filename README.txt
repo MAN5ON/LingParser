@@ -18,5 +18,5 @@
 
 -- Для правильной работы программы нужно установить библиотеку с языковой моделью.
 Поочерёдно выполнив команды:
-  pip3 install dostoevsky
-  python -m dostoevsky download fasttext-social-network-model
+  pip3 install dostoevsky (Установка пакета)
+  python -m dostoevsky download fasttext-social-network-model (Установка языковой модели)
