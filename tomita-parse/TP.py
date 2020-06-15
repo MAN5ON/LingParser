@@ -4,9 +4,9 @@ import time
 
 from pymongo import MongoClient
 
-def write_sentence_db(setneces_person,sentences_place, news_id):
+def write_sentence_db(setneces_person,sentences_place, link):
     if setneces_person or  sentences_place :
-        collection_sentence.insert_one({"news_id": news_id, "sentence_person": setneces_person, "sentence_places": sentences_place})
+        collection_sentence.insert_one({"link": link, "sentence_person": setneces_person, "sentence_places": sentences_place})
 
 
 def getSentencePerson(news_id):
@@ -27,13 +27,15 @@ def getSentencePerson(news_id):
 
 def getPlaces():
     places = []
+    place = ""
     with open("facts.txt") as file:
         facts_text = file.read()
     s = re.sub(r'\s+', ' ', facts_text, flags=re.M)
     for s in re.split(r'(?<=[.!?…]) ', s):
         tmp = re.findall(r'Place {.*?}',s)
-        tmp = " ".join(tmp)
-        place = re.sub(r'[a-z]|[A-z]|=|{|}', "", tmp)
+        for k in tmp:
+            place = re.sub(r'[a-z]|[A-z]|=|{|}', "", k)
+            k = ''
         if(place):
             places.append(place)
     places = deleteDuplicate(places)
@@ -42,13 +44,15 @@ def getPlaces():
 
 def getPersons():
     persons = []
+    person = ""
     with open("facts.txt") as file:
         facts_text = file.read()
     s = re.sub(r'\s+', ' ', facts_text, flags=re.M)
     for s in re.split(r'(?<=[.!?…]) ', s):
         tmp = re.findall(r'Person {.*?}',s)
-        tmp = " ".join(tmp)
-        person = re.sub(r'[a-z]|[A-z]|=|{|}', "", tmp)
+        for k in tmp:
+            person = re.sub(r'[a-z]|[A-z]|=|{|}', "", k)
+            k = ''
         if(person):
             persons.append(person)
     persons = deleteDuplicate(persons)
@@ -72,13 +76,33 @@ def getSentencePlace(news_id):
     return sentences_suitable_places
 
 def insert_persons_on_db(persons):
-    collection_persons.insert_one(
+    if persons:
+        collection_persons.insert_one(
         {"persons": persons})
 
 def insert_places_on_db(places):
-    collection_places.insert_one(
+    if places:
+        collection_places.insert_one(
         {"places": places})
 
+
+def finalyiDeleteDuplicate(list):
+    res = ''
+    list2 = []
+    for i in list:
+        if len(i) > 1:
+            i = ",".join(i)
+        res += ''.join(i) + ','
+    res = res.title()
+    res2 = res.split(',')
+    clear_list = deleteDuplicate(res2)
+    clear_list = clear_list[:-1]
+    n = -1
+    for i in clear_list:
+        n += 1
+        list2.append([])
+        list2[n].append(i)
+    return list2 #Двумерный список с очищенными дубликатами
 
 def deleteDuplicate(l):
     n = []
@@ -90,9 +114,12 @@ def deleteDuplicate(l):
 def tparse():
     persons=[]
     places = []
+    n =1
     for t in collection.find():
+        n+=1
+        print(n)
         print(collection.find())
-        news_id = t['_id']
+        link = t['link']
         try:
             text = t['text_stat']
         except KeyError:
@@ -105,17 +132,19 @@ def tparse():
         # Вместо /home/skelllet/tomita-parser/build/bin/tomita-parser должно быть tomita-parser, но у меня не сработало
         time.sleep(0.7)#Без этого данные в бд отображаются неверно
 
-        seteneces_person = getSentencePerson(news_id)
+        seteneces_person = getSentencePerson(link)
         if seteneces_person:
             persons.append(getPersons())
             persons=deleteDuplicate(persons)
             deleteExcess(seteneces_person)
-        sentences_place = getSentencePlace(news_id)
+        sentences_place = getSentencePlace(link)
         if sentences_place:
             places.append(getPlaces())
             places = deleteDuplicate(places)
             deleteExcess(sentences_place)
-        write_sentence_db(seteneces_person, sentences_place, news_id)
+        write_sentence_db(seteneces_person, sentences_place, link)
+    persons = finalyiDeleteDuplicate(persons)
+    places = finalyiDeleteDuplicate(places)
     insert_persons_on_db(persons)
     insert_places_on_db(places)
 
