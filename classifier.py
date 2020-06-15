@@ -23,9 +23,11 @@ if __name__ == "__main__":
     for sentence in collection_sentence.find():
         if (sentence['sentence_person']):
             persObj  = classifier(sentence['sentence_person'])
+            persObj['link'] = sentence['link']
             collection_classify.insert_one(persObj)
     print("Отношения высказываний к местам и достопримечательностям: ")
     for sentence in collection_sentence.find():
         if (sentence['sentence_places']):
             placeObj  = classifier(sentence['sentence_places'])
+            placeObj['link'] = sentence['link']
             collection_classify.insert_one(placeObj)
