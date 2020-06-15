@@ -46,7 +46,8 @@ for j in urls:
         href_stat = d.get('children_href')
         news.clear()
         ruslan += 1
-        print (ruslan)
+        print(ruslan)
+
 
         def get_html(html):
             r = requests.get(href_stat, headers=HEADERS)
