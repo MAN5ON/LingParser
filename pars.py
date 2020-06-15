@@ -9,7 +9,7 @@ from pymongo import MongoClient
 
 client = MongoClient("mongodb+srv://admin:admin@cluster0-y2po7.mongodb.net/vpravda")
 db = client.vpravda
-collection = db.testparse
+collection = db.archive
 
 HEADERS = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36',
@@ -18,7 +18,7 @@ HEADERS = {
 urls = []
 urls2 = []
 news = []
-schet = -1
+
 chromedriver = "C:/Projects/web-cloud-parser/chromedriver"
 driver = webdriver.Chrome(chromedriver)
 driver.get("https://vpravda.ru/archive/")
@@ -40,12 +40,13 @@ for j in urls:
             'children_href': b
         }
         urls2.append(url2)
-
+    ruslan = -1
     for d in urls2:
         driver.get(d['children_href'])
         href_stat = d.get('children_href')
         news.clear()
-
+        ruslan += 1
+        print (ruslan)
 
         def get_html(html):
             r = requests.get(href_stat, headers=HEADERS)
@@ -61,13 +62,22 @@ for j in urls:
                     'link': driver.current_url,
                     'title': item.find('h1', class_='page__title title').get_text(),
                     'time_date': item.find('span', class_='date-display-single').get_text(),
-                    'text_stat': item.find('div', class_='field field-name-body field-type-text-with-summary field-label-hidden').find().get_text(),
+                    'text_stat': item.find('div',
+                                           class_='field field-name-body field-type-text-with-summary field-label-hidden').find().get_text(),
 
                 }
                 collection.insert_one(info)
                 news.append(info)
 
             return news
+
+
+        if ruslan == 20:
+            driver.quit()
+            chromedriver = "C:/Projects/web-cloud-parser/chromedriver"
+            driver = webdriver.Chrome(chromedriver)
+            driver.get(d['children_href'])
+            ruslan = 0
 
 
         def parse():
@@ -84,6 +94,5 @@ for j in urls:
 
     urls2.clear()
     driver.back()
-
 
 driver.quit()
