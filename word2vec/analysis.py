@@ -15,7 +15,9 @@ def save_text_on_txt(collection):
             continue
         f.write(text)
     f.close()
-    print("Данные из бд добавлены в text.txt")
+    print("""
+            Данные из бд добавлены в text.txt
+          """)
 
 
 def get_synonyms(elements, count, model, spark_session):
@@ -24,6 +26,8 @@ def get_synonyms(elements, count, model, spark_session):
         try:
             elementDF = spark_session.createDataFrame([
                 (element[0].lower().split(" "),)], ["words"])
+            print(element[0])
+            print(elementDF)
             transform_elem = model.transform(elementDF)
             synonyms = model.findSynonyms(transform_elem.collect()[0][1], count).collect()
             result.append(synonyms)
@@ -33,21 +37,39 @@ def get_synonyms(elements, count, model, spark_session):
     return result
 
 def getPerson():
-    for i in collection.find():
-        try:
-            persons = i['sentence_person']
-        except KeyError:
-            continue
+    persons = []
+    newstr = ""
+    for i in collection_persons.find():
+        persons = i['persons']
+    for n in persons:
+        for k in n:
+            index = -1
+            for j in k:
+                index += 1
+                if index > 3:
+                    newstr += j
+        n.clear()
+        n.append(newstr)
+        newstr = ""
     return persons
 
 
 def getPlace():
-    for i in collection.find():
-        try:
-            place = i['sentence_places']
-        except KeyError:
-            continue
-    return  place
+    newstr=""
+    places = []
+    for i in collection_places.find():
+        places = i['places']
+    for n in places:
+        for k in n:
+            index = -1
+            for j in k:
+                index += 1
+                if index>3:
+                    newstr+=j
+        n.clear()
+        n.append(newstr)
+        newstr = ""
+    return places
 
 def print_elem(elements, elements_synonyms):
     for i in range(len(elements_synonyms)):
@@ -58,6 +80,17 @@ def print_elem(elements, elements_synonyms):
 
 PATH = 'model/data/'
 
+def insert_synonyms_persons_on_db(persons, persons_synonyms):
+    i = 0
+    for n in persons:
+        synon_collec.insert_one({"person": persons[i], "synonyms": persons_synonyms[i]})
+        i+=1
+
+def insert_synonyms_places_on_db(places, places_synonyms):
+    i = 0
+    for n in places:
+        synon_collec.insert_one({"places": places[i], "synonyms": places_synonyms[i]})
+        i += 1
 
 def createModel():
     if (not os.path.exists('model')):
@@ -67,30 +100,38 @@ def createModel():
 
         word2vec.create_w2v_model()
 
-    # persons = getPerson()
-    # places = getPlace()
-    #
-    # spark = SparkSession \
-    #     .builder \
-    #     .appName("SimpleApplication") \
-    #     .getOrCreate()
-    #
-    #
-    # model = Word2VecModel.load(PATH)
-    #
-    # pprint("Поиск контекстных синонимов персон:")
-    # persons_synonyms = get_synonyms(persons, 5, model, spark)
-    # print_elem(persons, persons_synonyms)
-    #
-    # pprint("Поиск контекстных синонимов достопримечательностей:")
-    # places_synonyms = get_synonyms(places, 5, model, spark)
-    # print_elem(places, places_synonyms)
-    #
-    # spark.stop()
+    persons = getPerson()
+    print(persons)
+    places = getPlace()
+    print(places)
+
+    spark = SparkSession \
+        .builder \
+        .appName("SimpleApplication") \
+        .getOrCreate()
+
+
+    model = Word2VecModel.load(PATH)
+
+    pprint("Поиск контекстных синонимов персон:")
+    persons_synonyms = get_synonyms(persons, 5, model, spark)
+    print(persons_synonyms)
+    insert_synonyms_persons_on_db(persons,persons_synonyms)
+    print_elem(persons, persons_synonyms)
+
+    pprint("Поиск контекстных синонимов достопримечательностей:")
+    places_synonyms = get_synonyms(places, 5, model, spark)
+    insert_synonyms_places_on_db(places,places_synonyms)
+    print_elem(places, places_synonyms)
+    print(places_synonyms)
+    spark.stop()
 
 
 if __name__ == '__main__':
     client = MongoClient("mongodb+srv://admin:admin@cluster0-y2po7.mongodb.net/vpravda")
     db = client.vpravda
     collection = db.archive
+    synon_collec = db.synonym
+    collection_places = db.places
+    collection_persons = db.persons
     createModel()
