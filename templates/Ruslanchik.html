@@ -6,17 +6,19 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="/static/main.css">
-    <title>Парсер vpravda.ru</title>
+    <title>Tomita Parser</title>
 </head>
 <body>
-<p class="head">Новости Сайта <a href="http://vpravda.ru">http://vpravda.ru</a></p>
-<p class="link"><a href="/ruslan"> Переход на страницу Tomita</a></p>
+<p class="head">Контекстные Синонимы</p>
+
+<p class="link"><a href="/renat"> Статьи "Волгоградской Правды" </a> | <a href="/ruslan"> Tomita Parser </a>| <a href="/vlad"> Анализ тональности </a></p>
+
 <ul>
-    {% for item in cur %}
+    {% for item in syn %}
         <li>
             <div class="post">
                 <label>
-                    <span> <p>Заголовок:  {{ item.title }}  <br>  Ссылка:  <a href="{{ item.link }}">{{ item.link }}</a>  <br>  Дата публикации:  {{ item.time_date }} <br> <br>Содержание статьи: <br> <br>{{ item.text_stat }}</p></span>
+                    <span> <p>Персоны:  {{ item.person }}  <br>  Место:  {{ item.places }}  <br>  Контекстные Синонимы: {{ item.synonyms }}</p></span>
                 </label>
             </div>
         </li>

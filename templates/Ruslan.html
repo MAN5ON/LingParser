@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="/static/main.css">
+    <title>Tomita Parser</title>
+</head>
+<body>
+<p class="head">Tomita Parser</p>
+<p class="link"><a href="/renat"> Статьи "Волгоградской Правды" </a> | <a href="/vlad"> Анализ Тональности</a> | <a
+        href="/ruslanchik"> Контекстные Синонимы</a>
+    <ul>
+        {% for item in per %}
+            <li>
+                <div class="post">
+                    <label>
+                        <span><p>ID Новости: {{ item.news_id }} <br> Упоминание Персоны: {{ item.sentence_person }} <br> Упоминание Местности: {{ item.sentence_places }}</p></span>
+                    </label>
+                </div>
+            </li>
+        {% endfor %}
+
+</ul>
+<p class="vse"><img
+        src="https://avatars.mds.yandex.net/get-zen_doc/1221393/pub_5e64643cb4e2b434ba67a7a0_5e71c4a79782a00adefbfa61/scale_1200"
+        alt="ВСЁ!"></p>
+
+</body>
+</html>

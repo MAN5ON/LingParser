@@ -6,17 +6,18 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="/static/main.css">
-    <title>Tomita Parser</title>
+    <title>Анализ Тональности</title>
 </head>
 <body>
-<p class="head">Tomita Parser</p>
-<p class="link"><a href="/renat"> Переход на страницу Парсера</a></p>
+<p class="head">Анализ Тональности</p>
+<p class="link"><a href="/renat"> Статьи "Волгоградской Правды"</a> | <a href="/ruslan"> Tomita Parser</a>| <a
+        href="/ruslanchik"> Контекстные Синонимы</a></p>
 <ul>
-    {% for item in per %}
+    {% for item in cly %}
         <li>
             <div class="post">
                 <label>
-                    <span> <p>ID Новости:  {{ item.news_id }}  <br>  Упоминание Персоны:  {{ item.sentence_person }}  <br>  Упоминание Местности:  {{ item.sentence_places }}</p></span>
+                    <span> <p>Предложение:  {{ item.sentence }}  <br>  Оценка:  {{ item.sentiment }}  <br>  Ссылка на статью:  <a href="{{ item.link }}">{{ item.link }}</a></p></span>
                 </label>
             </div>
         </li>
