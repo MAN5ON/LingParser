@@ -21,8 +21,8 @@ def person():
 
 
 @app.route('/ruslanchik', methods=['GET'])
-def synonym():
-    syn = mongo.db.synonym.find({}, {'places': 1, 'person': 1, 'synonyms': 1, '_id': 0})
+def synonyms():
+    syn = mongo.db.synonyms.find({}, {'places': 1, 'person': 1, 'synonyms': 1, '_id': 0})
     return render_template('Ruslanchik.html', syn=list(syn))
 
 
