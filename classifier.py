@@ -7,27 +7,31 @@ def classifier(messages = ['ds']):
     tokens = tokenizer.split('всё очень плохо')
     model = FastTextSocialNetworkModel(tokenizer=tokenizer)
     results = model.predict(messages, k=2)
+    resSents = []
     for message, sentiment in zip(messages, results):
         print(message, '->', sentiment)
-        return {
+        resSents.append({
             'sentence': message,
             'sentiment': sentiment
-        }
+        })
+    return resSents
 
 if __name__ == "__main__":
     client = MongoClient("mongodb+srv://admin:admin@cluster0-y2po7.mongodb.net/vpravda")
     db = client.vpravda
     collection_sentence = db.sentence
     collection_classify = db.classify
-    print("Отношения высказываний к персонам: ")
+    print("Отношения высказываний: ")
     for sentence in collection_sentence.find():
-        if (sentence['sentence_person']):
-            persObj  = classifier(sentence['sentence_person'])
-            persObj['link'] = sentence['link']
-            collection_classify.insert_one(persObj)
-    print("Отношения высказываний к местам и достопримечательностям: ")
-    for sentence in collection_sentence.find():
-        if (sentence['sentence_places']):
-            placeObj  = classifier(sentence['sentence_places'])
-            placeObj['link'] = sentence['link']
-            collection_classify.insert_one(placeObj)
+        mySentMass = []
+        link = sentence['link']
+        nameCell = ''
+        if ('sentence_person' in sentence.keys()):
+            nameCell = 'sentence_person'
+        elif ('sentence_places' in sentence.keys()):
+            nameCell = 'sentence_places'
+        mySentMass = classifier(sentence[nameCell])
+        for oneSent in mySentMass:
+            myObj = oneSent
+            oneSent['link'] = link
+            collection_classify.insert_one(myObj)
